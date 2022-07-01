@@ -21,7 +21,8 @@ describe('Users', () => {
       pro: false
     });
 
-    expect(response.status).toBe(201);
+    expect(response.status).toEqual(201);
+  //  expect(response.status).toBe(201);//tobe parece igual ao toEqual mas nao funciona igual
   });
 
   it('should not be able to create a new user when username already exists', async () => {

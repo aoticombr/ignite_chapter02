@@ -25,10 +25,10 @@ function checksCreateTodosUserAvailability(req, res, next) {
   if ((user.pro === false) && (user.todos.length < 10)){
     return next();
   }
-  else if ((user.pro === true)){
+  else if (user.pro === true){
     return next();
   } else {
-    return res.status(403).json({error:'limit targe'});
+    return res.status(403).json({error:'limit todo'});
   }
 }
 
@@ -40,15 +40,19 @@ function checksTodoExists(req, res, next) {
   } else {
     const user = users.find(user => user.username === username);
     if (user) {
-      req.user = user;
+       
       const todo = user.todos.find(todo => todo.id === id);
-      if (todo) {        
+      if (todo) {    
+        req.user = user;   
         req.todo = todo;
-        return next();
-      } else {
+        return next(); 
+      } 
+      else {
         return res.status(404).json({error:'todo not found'});
-      }    
-    } else {
+      }   
+      
+    } 
+    else {
       return res.status(404).json({error:'user not found'});
     }
   }
@@ -57,6 +61,9 @@ function checksTodoExists(req, res, next) {
 
 function findUserById(req, res, next) {
   const {id} = req.params;
+  //if (validate(id) === false) {
+  //  return res.status(400).json({error:'id invalid'});
+  //}
   const user = users.find(user => user.id === id);
   if (user) {
     req.user = user;
@@ -67,8 +74,6 @@ function findUserById(req, res, next) {
 }
 
 app.post('/users', (req, res) => {
- 
-
   const { name, username } = req.body;
 
   const usernameAlreadyExists = users.some((user) => user.username === username);
@@ -81,8 +86,9 @@ app.post('/users', (req, res) => {
     id: uuidv4(),
     name,
     username,
-    pro: false,
-    todos: []
+    todos: [],
+    pro: false
+    
   };
 
   users.push(user);
@@ -92,7 +98,6 @@ app.post('/users', (req, res) => {
 
 app.get('/users/:id', findUserById, (req, res) => {
   const { user } = req;
-
   return res.json(user);
 });
 
@@ -111,7 +116,7 @@ app.patch('/users/:id/pro', findUserById, (req, res) => {
 app.get('/todos', checksExistsUserAccount, (req, res) => {
   const { user } = req;
 
-  return res.send(user.todos);
+  return res.json(user.todos);
 });
 
 app.post('/todos', checksExistsUserAccount, checksCreateTodosUserAvailability, (req, res) => {
